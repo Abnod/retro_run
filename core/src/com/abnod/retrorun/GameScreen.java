@@ -44,9 +44,9 @@ public class GameScreen implements Screen {
     public void show() {
         atlas = new TextureAtlas("runner.pack");
         textureRunner = atlas.findRegion("runner");
-        player = new Player(this, world, textureRunner, new Vector2(300, 250));
+        player = new Player(this, world, textureRunner, new Vector2(150, 350));
         textureGround = atlas.findRegion("ground");
-        floor = new Floor(this, world, textureGround, new Vector2(0,0));
+        floor = new Floor(this, world, textureGround, new Vector2(100,100));
         stage.addActor(floor);
         stage.addActor(player);
 

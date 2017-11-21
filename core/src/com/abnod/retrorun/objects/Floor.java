@@ -36,7 +36,7 @@ public class Floor extends Image{
             body = world.createBody(groundBodyDef);
 
             PolygonShape groundBox = new PolygonShape();
-            groundBox.setAsBox(WIDTH * 16, HEIGHT);
+            groundBox.setAsBox(WIDTH/2, HEIGHT/2);
 
             body.createFixture(groundBox, 0.0f);
 
