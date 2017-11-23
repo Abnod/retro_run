@@ -1,6 +1,7 @@
 package com.abnod.retrorun;
 
 
+import com.abnod.retrorun.objects.Background;
 import com.abnod.retrorun.objects.Floor;
 import com.abnod.retrorun.objects.Player;
 import com.badlogic.gdx.Gdx;
@@ -32,7 +33,7 @@ public class GameScreen implements Screen {
     private World world;
     private Player player;
     private Floor floor;
-    private Image background;
+    private Background background;
 
     private TextureAtlas atlas;
     private TextureRegion textureBackground;
@@ -43,9 +44,9 @@ public class GameScreen implements Screen {
     private TextureRegion textureRunner;
     Texture bg;
 
-    private float playerAnchor = 1.0f;
+    private float playerAnchor = 2.0f;
     private int sourceX = 0;
-    private final float groundHeight = 1.0f;
+    private final float groundHeight = 2.0f;
 
     public GameScreen(RunnerGame runnerGame) {
         this.batch = runnerGame.getBatch();
@@ -56,7 +57,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        world = new World(new Vector2(1f,-10), true);
+        world = new World(new Vector2(0.0f,-2.5f), true);
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
@@ -66,8 +67,8 @@ public class GameScreen implements Screen {
         bg = new Texture("bg.jpg");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         textureBackground = new TextureRegion(bg);
-        textureBackground2 = new TextureRegion(bg);
-
+        background = new Background(this, world, textureBackground);
+        stage.addActor(background);
         for (int i = 0; i <16; i+=2) {
             stage.addActor(new Floor(this, world, textureGround, new Vector2(i + 1f,groundHeight/2)));
         }
@@ -77,20 +78,27 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        sourceX +=0.1;
-        System.out.println(sourceX);
+//        sourceX +=0.1;
         camera.update();
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        batch.draw(textureBackground,0,0,0,0,viewport.getWorldWidth(),viewport.getWorldHeight(),1,1,0);
-        batch.draw(textureBackground2,viewport.getWorldWidth(),0,0,0,viewport.getWorldWidth(),viewport.getWorldHeight(),1,1,0);
-        batch.end();
         stage.act();
         stage.draw();
         debugRenderer.render(world, camera.combined);
-        world.step(1*delta, 6, 2);
+        worldStep(delta);
+    }
+
+    private float accum = 0f;
+    private final float step = 1f / 60f;
+    private final float maxAccum = 1f / 20f;
+
+    private void worldStep(float delta) {
+        accum += delta;
+        accum = Math.min(accum, maxAccum);
+        while (accum > step) {
+            world.step(step, 8, 3);
+            accum -= step;
+        }
     }
 
     @Override
@@ -132,5 +140,9 @@ public class GameScreen implements Screen {
 
     public float getPlayerAnchor() {
         return playerAnchor;
+    }
+
+    public float getGroundHeight() {
+        return groundHeight;
     }
 }

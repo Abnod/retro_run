@@ -2,7 +2,6 @@ package com.abnod.retrorun.objects;
 
 
 import com.abnod.retrorun.GameScreen;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -13,18 +12,22 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Floor extends Image{
 
-        private Screen gameScreen;
+        private GameScreen gameScreen;
+        private Viewport viewport;
+
         private TextureRegion textureRegion;
         private Body body;
 
         private final int WIDTH = 2;
         private final int HEIGHT = 2;
 
-        public Floor(Screen gameScreen, World world, TextureRegion textureRegion, Vector2 position) {
+        public Floor(GameScreen gameScreen, World world, TextureRegion textureRegion, Vector2 position) {
             this.gameScreen = gameScreen;
+            this.viewport = gameScreen.getViewport();
             this.textureRegion = textureRegion;
 
             BodyDef groundBodyDef = new BodyDef();
@@ -47,9 +50,8 @@ public class Floor extends Image{
     @Override
     public void act(float delta) {
         super.act(delta);
-        if(body.getPosition().x +0.5f < 0){
-            System.out.println("replace floor");
-            body.setTransform(body.getPosition().x + 12.8f,body.getPosition().y, 0);
+        if(body.getPosition().x + 1f < gameScreen.getCamera().position.x - viewport.getWorldWidth()/2){
+            body.setTransform(body.getPosition().x + 16, body.getPosition().y, 0);
         }
     }
 
