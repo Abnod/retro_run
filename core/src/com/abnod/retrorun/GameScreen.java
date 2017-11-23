@@ -8,6 +8,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -35,6 +36,7 @@ public class GameScreen implements Screen {
 
     private TextureAtlas atlas;
     private TextureRegion textureBackground;
+    private TextureRegion textureBackground2;
     private TextureRegion textureGround;
     private TextureRegion textureBird;
     private TextureRegion textureBird2;
@@ -63,6 +65,8 @@ public class GameScreen implements Screen {
         textureGround = atlas.findRegion("ground");
         bg = new Texture("bg.jpg");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        textureBackground = new TextureRegion(bg);
+        textureBackground2 = new TextureRegion(bg);
 
         for (int i = 0; i <16; i+=2) {
             stage.addActor(new Floor(this, world, textureGround, new Vector2(i + 1f,groundHeight/2)));
@@ -78,15 +82,14 @@ public class GameScreen implements Screen {
         camera.update();
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        debugRenderer.render(world, camera.combined);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.draw(bg,sourceX,0,0,0,viewport.getWorldWidth(),viewport.getWorldHeight(),
-                1,1,0,sourceX,0,(int)viewport.getWorldWidth(),(int)viewport.getWorldHeight(),
-                false,false);
+        batch.draw(textureBackground,0,0,0,0,viewport.getWorldWidth(),viewport.getWorldHeight(),1,1,0);
+        batch.draw(textureBackground2,viewport.getWorldWidth(),0,0,0,viewport.getWorldWidth(),viewport.getWorldHeight(),1,1,0);
         batch.end();
         stage.act();
         stage.draw();
+        debugRenderer.render(world, camera.combined);
         world.step(1*delta, 6, 2);
     }
 
