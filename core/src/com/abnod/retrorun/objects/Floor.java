@@ -2,51 +2,60 @@ package com.abnod.retrorun.objects;
 
 
 import com.abnod.retrorun.GameScreen;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class Floor extends Image{
 
-        private GameScreen gameScreen;
-        private World world;
+        private Screen gameScreen;
         private TextureRegion textureRegion;
-        private Vector2 position;
         private Body body;
 
-        private float time;
+        private final int WIDTH = 2;
+        private final int HEIGHT = 2;
 
-        private final int WIDTH = 200;
-        private final int HEIGHT = 200;
-
-        public Floor(GameScreen gameScreen, World world, TextureRegion textureRegion, Vector2 position) {
+        public Floor(Screen gameScreen, World world, TextureRegion textureRegion, Vector2 position) {
             this.gameScreen = gameScreen;
-            this.world = world;
             this.textureRegion = textureRegion;
-            this.position = position;
 
             BodyDef groundBodyDef = new BodyDef();
+            groundBodyDef.type = BodyDef.BodyType.StaticBody;
             groundBodyDef.position.set(position);
 
             body = world.createBody(groundBodyDef);
 
-            PolygonShape groundBox = new PolygonShape();
-            groundBox.setAsBox(WIDTH/2, HEIGHT/2);
+            PolygonShape shape = new PolygonShape();
+            shape.setAsBox(WIDTH/2, HEIGHT/2);
 
-            body.createFixture(groundBox, 0.0f);
-
-            groundBox.dispose();
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 1;
+            fixtureDef.friction = 0;
+            Fixture fixture = body.createFixture(fixtureDef);
+            shape.dispose();
         }
 
-        public void update(float delta){
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if(body.getPosition().x +0.5f < 0){
+            System.out.println("replace floor");
+            body.setTransform(body.getPosition().x + 12.8f,body.getPosition().y, 0);
         }
+    }
 
-        public void draw(SpriteBatch batch){
-
-        }
+    @Override
+    public void draw(Batch batch, float parentAlpha){
+        super.draw(batch, parentAlpha);
+        batch.draw(textureRegion, body.getPosition().x - WIDTH/2,body.getPosition().y - HEIGHT/2, 0f, 0f, WIDTH, HEIGHT, 1, 1, 0);
+    }
 }

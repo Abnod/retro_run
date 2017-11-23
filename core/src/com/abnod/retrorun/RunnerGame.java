@@ -3,6 +3,8 @@ package com.abnod.retrorun;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -15,19 +17,23 @@ public class RunnerGame extends Game {
 		MENU, GAME
 	}
 
-	SpriteBatch batch;
+	private SpriteBatch batch;
 	private Viewport viewport;
 	private GameScreen gameScreen;
 	private MenuScreen menuScreen;
 	private String playerName;
+	private OrthographicCamera camera;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		this.gameScreen = new GameScreen(this, batch);
+		camera = new OrthographicCamera();
+		this.viewport = new FitViewport(12.8f, 7.2f, camera);
+		viewport.apply();
+		camera.position.set(camera.viewportWidth/2, camera.viewportHeight/2,0);
+		this.gameScreen = new GameScreen(this);
 		this.menuScreen = new MenuScreen(this, batch);
-		this.viewport = new FitViewport(1280.0F, 720.0F);
-		changeScreen(ScreenType.MENU);
+		changeScreen(ScreenType.GAME);
 	}
 
 	public void changeScreen(ScreenType screenType){
@@ -66,5 +72,13 @@ public class RunnerGame extends Game {
 
 	public void setPlayerName(String playerName) {
 		this.playerName = playerName;
+	}
+
+	public SpriteBatch getBatch() {
+		return batch;
+	}
+
+	public OrthographicCamera getCamera() {
+		return camera;
 	}
 }

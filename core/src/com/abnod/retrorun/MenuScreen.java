@@ -40,11 +40,10 @@ public class MenuScreen implements Screen {
 
     @Override
     public void render(float delta) {
-//        update(delta);
+        stage.draw();
         batch.begin();
         font96.draw(batch, "Retro_Runner", 0, 500, 1280, 1, false);
         batch.end();
-        stage.draw();
     }
 
     private void generateFonts(){
@@ -127,6 +126,10 @@ public class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
+        skin.dispose();
+        atlas.dispose();
+        font32.dispose();
+        font96.dispose();
     }
 }
