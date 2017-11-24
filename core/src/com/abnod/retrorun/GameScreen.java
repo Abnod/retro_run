@@ -47,6 +47,10 @@ public class GameScreen implements Screen {
     private float playerAnchor = 2.0f;
     private int sourceX = 0;
     private final float groundHeight = 2.0f;
+    private float accum = 0f;
+    private final float step = 1f / 60f;
+    private final float maxAccum = 1f / 20f;
+
 
     public GameScreen(RunnerGame runnerGame) {
         this.batch = runnerGame.getBatch();
@@ -87,10 +91,6 @@ public class GameScreen implements Screen {
         debugRenderer.render(world, camera.combined);
         worldStep(delta);
     }
-
-    private float accum = 0f;
-    private final float step = 1f / 60f;
-    private final float maxAccum = 1f / 20f;
 
     private void worldStep(float delta) {
         accum += delta;

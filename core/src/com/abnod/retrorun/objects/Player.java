@@ -1,15 +1,12 @@
 package com.abnod.retrorun.objects;
 
 import com.abnod.retrorun.GameScreen;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -25,10 +22,12 @@ public class Player extends Image{
     private Body playerBody;
 
     private float time;
-    private int doubleJumpTime;
+    private int doubleJumpTime=0;
+    private float rotateAngle = 0;
 
     private final float WIDTH = 1;
     private final float HEIGHT = 1;
+
 
     public Player(GameScreen gameScreen, World world, TextureRegion textureRegion, float positionX, float positionY) {
         this.gameScreen = gameScreen;
@@ -115,33 +114,52 @@ public class Player extends Image{
         batch.setProjectionMatrix(gameScreen.getCamera().combined);
         int frame = (int)(time / 0.1f);
         frame = frame % 6;
+//        batch.draw(textureRegion[0][frame], playerBody.getPosition().x-WIDTH/2, playerBody.getPosition().y-HEIGHT/2, WIDTH/2, HEIGHT/2,
+//                WIDTH, HEIGHT, 1, 1, (float)Math.toDegrees(playerBody.getAngle()));
         batch.draw(textureRegion[0][frame], playerBody.getPosition().x-WIDTH/2, playerBody.getPosition().y-HEIGHT/2, WIDTH/2, HEIGHT/2,
-                WIDTH, HEIGHT, 1, 1, (float)Math.toDegrees(playerBody.getAngle()));
+                WIDTH, HEIGHT, 1, 1, rotateAngle);
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
+        if (rotateAngle > 0.0f){
+            if (rotateAngle > 360.0f){
+                rotateAngle += 80.0f * delta;
+            }
+            rotateAngle += 280.0f * delta;
+        }
+
+        //if player velocity < 5 make acceleration
         if (playerBody.getLinearVelocity().x < 5.0f){
             playerBody.applyLinearImpulse(new Vector2(0.001f, 0f), playerBody.getWorldCenter(), true);
         }
-        time += 240f * delta / 300.0f;
-//        if (body.getPosition().y <= gameScreen.getGroundHeight()+HEIGHT/2){
-//            body.setLinearVelocity(240f, 0);
-//            doubleJumpTime = 0;
-//        }
-//        if (Gdx.input.justTouched() && (body.getPosition().y <= gameScreen.getGroundHeight()+48 || doubleJumpTime <=0)){
-        if (Gdx.input.justTouched() && playerBody.getPosition().y - HEIGHT/2 < gameScreen.getGroundHeight()){
-            playerBody.applyForceToCenter(0f,50f,true);
-//            body.applyLinearImpulse(new Vector2(body.getMass() * body.getLinearVelocity().x * delta, body.getMass() * 1440 ), body.getWorldCenter(),false);
-//            playerBody.applyLinearImpulse(0f, 8f, playerBody.getPosition().x, playerBody.getPosition().y, true);
-//            doubleJumpTime = 2;
-//            soundJump.play();
-//            if(position.y > gameScreen.getGroundHeight()){
-//                doubleJumpTime = 5.0f;
-//                rotateAngle = 1.0f;
-//            }
+
+        //when grounded rum animation (time)
+        if (playerBody.getPosition().y - HEIGHT/2 <= gameScreen.getGroundHeight()){
+//            time += 240f * delta / 300.0f;
+            time += 240*(1+playerBody.getLinearVelocity().x/2) * delta / 600.0f;
+            if (doubleJumpTime > 0){
+                doubleJumpTime = 0;
+                rotateAngle = 0;
+            }
         }
+
+
+        if (Gdx.input.justTouched() && (playerBody.getPosition().y - HEIGHT/2 < gameScreen.getGroundHeight() || doubleJumpTime == 1)){
+            playerBody.setLinearVelocity(playerBody.getLinearVelocity().x, 0);
+            playerBody.applyForceToCenter(0f, 50f,true);
+            doubleJumpTime += 1;
+//            soundJump.play();.
+            if (doubleJumpTime == 2){
+                rotateAngle = 1f;
+            }
+        }
+        System.out.println(playerBody.getLinearVelocity().x);
+//        if(doubleJumpTime == 2){
+//        }
+
+
     }
 
     public Body getBody() {
