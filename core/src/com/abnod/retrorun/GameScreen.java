@@ -68,6 +68,7 @@ public class GameScreen implements Screen {
         atlas = new TextureAtlas("runner.pack");
         textureRunner = atlas.findRegion("runner");
         textureGround = atlas.findRegion("ground");
+        textureBird = atlas.findRegion("bird");
         bg = new Texture("bg.jpg");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         textureBackground = new TextureRegion(bg);
@@ -76,7 +77,7 @@ public class GameScreen implements Screen {
         for (int i = 0; i <16; i+=2) {
             stage.addActor(new Floor(this, world, textureGround, new Vector2(i + 1f,groundHeight/2)));
         }
-        player = new Player(this, world, textureRunner, playerAnchor, groundHeight);
+        player = new Player(this, world, textureRunner, textureBird, playerAnchor, groundHeight);
         stage.addActor(player);
     }
 

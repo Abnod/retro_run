@@ -19,6 +19,7 @@ public class Player extends Image{
     private GameScreen gameScreen;
     private World world;
     private TextureRegion[][] textureRegion;
+    private TextureRegion textureRegionJump;
     private Body playerBody;
 
     private float time;
@@ -29,10 +30,11 @@ public class Player extends Image{
     private final float HEIGHT = 1;
 
 
-    public Player(GameScreen gameScreen, World world, TextureRegion textureRegion, float positionX, float positionY) {
+    public Player(GameScreen gameScreen, World world, TextureRegion textureRegion, TextureRegion textureRegionJump, float positionX, float positionY) {
         this.gameScreen = gameScreen;
         this.world = world;
         this.textureRegion = textureRegion.split(100, 100);
+        this.textureRegionJump = textureRegionJump;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -114,21 +116,23 @@ public class Player extends Image{
         batch.setProjectionMatrix(gameScreen.getCamera().combined);
         int frame = (int)(time / 0.1f);
         frame = frame % 6;
-//        batch.draw(textureRegion[0][frame], playerBody.getPosition().x-WIDTH/2, playerBody.getPosition().y-HEIGHT/2, WIDTH/2, HEIGHT/2,
-//                WIDTH, HEIGHT, 1, 1, (float)Math.toDegrees(playerBody.getAngle()));
-        batch.draw(textureRegion[0][frame], playerBody.getPosition().x-WIDTH/2, playerBody.getPosition().y-HEIGHT/2, WIDTH/2, HEIGHT/2,
-                WIDTH, HEIGHT, 1, 1, rotateAngle);
+
+        //jumptime: 1 jump, 2 doublejump, 0 - grounded;
+        if (doubleJumpTime == 1){
+            batch.draw(textureRegion[0][4], playerBody.getPosition().x-WIDTH/2, playerBody.getPosition().y-HEIGHT/2, WIDTH/2, HEIGHT/2,
+                    WIDTH, HEIGHT, 1, 1, rotateAngle);
+        } else if (doubleJumpTime == 2){
+            batch.draw(textureRegionJump, playerBody.getPosition().x-WIDTH/2, playerBody.getPosition().y-HEIGHT/2, WIDTH/2, HEIGHT/2,
+                    WIDTH, HEIGHT, 1, 1, rotateAngle);
+        } else {
+            batch.draw(textureRegion[0][frame], playerBody.getPosition().x-WIDTH/2, playerBody.getPosition().y-HEIGHT/2, WIDTH/2, HEIGHT/2,
+                    WIDTH, HEIGHT, 1, 1, rotateAngle);
+        }
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (rotateAngle > 0.0f){
-            if (rotateAngle > 360.0f){
-                rotateAngle += 80.0f * delta;
-            }
-            rotateAngle += 280.0f * delta;
-        }
 
         //if player velocity < 5 make acceleration
         if (playerBody.getLinearVelocity().x < 5.0f){
@@ -141,25 +145,17 @@ public class Player extends Image{
             time += 240*(1+playerBody.getLinearVelocity().x/2) * delta / 600.0f;
             if (doubleJumpTime > 0){
                 doubleJumpTime = 0;
-                rotateAngle = 0;
+//                rotateAngle = 0;
             }
         }
 
-
+        //jump
         if (Gdx.input.justTouched() && (playerBody.getPosition().y - HEIGHT/2 < gameScreen.getGroundHeight() || doubleJumpTime == 1)){
             playerBody.setLinearVelocity(playerBody.getLinearVelocity().x, 0);
             playerBody.applyForceToCenter(0f, 50f,true);
             doubleJumpTime += 1;
 //            soundJump.play();.
-            if (doubleJumpTime == 2){
-                rotateAngle = 1f;
-            }
         }
-        System.out.println(playerBody.getLinearVelocity().x);
-//        if(doubleJumpTime == 2){
-//        }
-
-
     }
 
     public Body getBody() {
