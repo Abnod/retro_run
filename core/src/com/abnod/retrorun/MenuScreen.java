@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MenuScreen implements Screen {
 
@@ -21,6 +23,7 @@ public class MenuScreen implements Screen {
     private TextureAtlas atlas;
     private Stage stage;
     private Skin skin;
+    Viewport viewport;
 
     private BitmapFont font96;
     private BitmapFont font32;
@@ -28,6 +31,7 @@ public class MenuScreen implements Screen {
     public MenuScreen(RunnerGame runnerGame, SpriteBatch batch) {
         this.runnerGame = runnerGame;
         this.batch = batch;
+        viewport = new FitViewport(1280,720);
     }
 
 
@@ -62,7 +66,7 @@ public class MenuScreen implements Screen {
     }
 
     private void generateGUI(){
-        stage = new Stage(runnerGame.getViewport(), batch);
+        stage = new Stage(viewport, batch);
         skin = new Skin(atlas);
         Gdx.input.setInputProcessor(stage);
 
@@ -105,8 +109,8 @@ public class MenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        runnerGame.getViewport().update(width, height, true);
-        runnerGame.getViewport().apply();
+        viewport.update(width, height, true);
+        viewport.apply();
     }
 
     @Override

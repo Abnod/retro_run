@@ -1,0 +1,33 @@
+ground_desert.png
+size: 800, 200
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+ground-01
+  rotate: false
+  xy: 0, 0
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1
+ground-02
+  rotate: false
+  xy: 200, 0
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1
+ground-03
+  rotate: false
+  xy: 400, 0
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1
+ground-04
+  rotate: false
+  xy: 600, 0
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1

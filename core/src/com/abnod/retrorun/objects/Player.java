@@ -7,12 +7,16 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+
+import java.time.LocalTime;
+import java.util.Date;
 
 public class Player extends Image{
 
@@ -29,6 +33,8 @@ public class Player extends Image{
     private final float WIDTH = 1;
     private final float HEIGHT = 1;
 
+    private Date timer;
+    private Date newtimer;
 
     public Player(GameScreen gameScreen, World world, TextureRegion textureRegion, TextureRegion textureRegionJump, float positionX, float positionY) {
         this.gameScreen = gameScreen;
@@ -38,13 +44,25 @@ public class Player extends Image{
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(positionX,positionY+0.3f);
+        bodyDef.position.set(positionX+0.1f,positionY+0.3f);
 
 
         playerBody = world.createBody(bodyDef);
         playerBody.setFixedRotation(true);
 
-        for (int i = 0; i < 3; i++) {
+        CircleShape roundShape = new CircleShape();
+        roundShape.setRadius(0.17f);
+        roundShape.setPosition(new Vector2(-0.05f,-0.3f));
+
+        FixtureDef fixtureDefRound = new FixtureDef();
+        fixtureDefRound.shape = roundShape;
+        fixtureDefRound.density = 1f;
+        fixtureDefRound.friction = 0f;
+        fixtureDefRound.restitution = 0f;
+        Fixture fixtureRound = playerBody.createFixture(fixtureDefRound);
+        roundShape.dispose();
+
+        for (int i = 1; i < 3; i++) {
             PolygonShape shape = new PolygonShape();
             shape.set(getVertices(i));
 
@@ -70,6 +88,9 @@ public class Player extends Image{
 //        sensor.dispose();
 
         playerBody.setBullet(true);
+//        timer = new Date();
+        playerBody.setLinearVelocity(0.8f, world.getGravity().y);
+
     }
 
     private Vector2 [] getVertices(int i){
@@ -90,18 +111,18 @@ public class Player extends Image{
                 vertices[1] = new Vector2(0.20f, -0.10f);
                 vertices[2] = new Vector2(0.20f, 0f);
                 vertices[3] = new Vector2(-0.08f, 0.10f);
-                vertices[4] = new Vector2(-0.20f, -0.10f);
+                vertices[4] = new Vector2(-0.15f, -0.15f);
                 return vertices;
             }
             case 2:{
                 vertices = new Vector2[7];
                 vertices[0] = new Vector2(0.20f, 0f);
-                vertices[1] = new Vector2(0.30f, 0.5f);
-                vertices[2] = new Vector2(0.32f, 0.25f);
-                vertices[3] = new Vector2(0.25f, 0.38f);
-                vertices[4] = new Vector2(0f, 0.38f);
-                vertices[5] = new Vector2(-0.08f, 0.25f);
-                vertices[6] = new Vector2(-0.08f, 0.10f);
+                vertices[1] = new Vector2(0.30f, 0.05f);
+                vertices[2] = new Vector2(0.35f, 0.25f);
+                vertices[3] = new Vector2(0.25f, 0.36f);
+                vertices[4] = new Vector2(0.05f, 0.36f);
+                vertices[5] = new Vector2(-0.05f, 0.28f);
+                vertices[6] = new Vector2(-0.03f, 0.09f);
                 return vertices;
             }
         }
@@ -133,10 +154,14 @@ public class Player extends Image{
     @Override
     public void act(float delta) {
         super.act(delta);
-
+//        System.out.println(delta);
+//        System.out.println(playerBody.getMass()*delta/2+0.001f);
         //if player velocity < 5 make acceleration
         if (playerBody.getLinearVelocity().x < 5.0f){
-            playerBody.applyLinearImpulse(new Vector2(0.001f, 0f), playerBody.getWorldCenter(), true);
+            playerBody.applyLinearImpulse(new Vector2(playerBody.getMass()*delta*0.1f, 0f), playerBody.getWorldCenter(), true);
+        } else {
+//            newtimer = new Date();
+//            System.out.println((newtimer.getTime()-timer.getTime())/1000);
         }
 
         //when grounded rum animation (time)
@@ -150,7 +175,7 @@ public class Player extends Image{
         }
 
         //jump
-        if (Gdx.input.justTouched() && (playerBody.getPosition().y - HEIGHT/2 < gameScreen.getGroundHeight() || doubleJumpTime == 1)){
+        if (Gdx.input.justTouched() && (playerBody.getPosition().y - HEIGHT/2 < gameScreen.getGroundHeight() || doubleJumpTime != 2)){
             playerBody.setLinearVelocity(playerBody.getLinearVelocity().x, 0);
             playerBody.applyForceToCenter(0f, 50f,true);
             doubleJumpTime += 1;

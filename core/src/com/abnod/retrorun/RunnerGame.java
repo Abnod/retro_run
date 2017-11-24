@@ -33,7 +33,7 @@ public class RunnerGame extends Game {
 		camera.position.set(camera.viewportWidth/2, camera.viewportHeight/2,0);
 		this.gameScreen = new GameScreen(this);
 		this.menuScreen = new MenuScreen(this, batch);
-		changeScreen(ScreenType.GAME);
+		changeScreen(ScreenType.MENU);
 	}
 
 	public void changeScreen(ScreenType screenType){

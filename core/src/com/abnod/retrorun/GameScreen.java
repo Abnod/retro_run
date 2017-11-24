@@ -89,7 +89,7 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
-        debugRenderer.render(world, camera.combined);
+//        debugRenderer.render(world, camera.combined);
         worldStep(delta);
     }
 
@@ -97,7 +97,7 @@ public class GameScreen implements Screen {
         accum += delta;
         accum = Math.min(accum, maxAccum);
         while (accum > step) {
-            world.step(step, 8, 3);
+            world.step(step, 15, 10);
             accum -= step;
         }
     }
