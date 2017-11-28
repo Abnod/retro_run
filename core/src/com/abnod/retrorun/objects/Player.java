@@ -25,7 +25,6 @@ public class Player extends Image{
     private int doubleJumpTime=0;
     private float velocity;
     private boolean isGrounded;
-    private float timer = 0;
 
     private final float WIDTH = 1;
     private final float HEIGHT = 1;
@@ -38,7 +37,7 @@ public class Player extends Image{
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(positionX+0.1f,positionY+0.3f);
+        bodyDef.position.set(positionX+0.1f,positionY);
 
 
         playerBody = world.createBody(bodyDef);
@@ -69,9 +68,21 @@ public class Player extends Image{
         Fixture sensorFixture = playerBody.createFixture(fixtureDef);
         sensorFixture.setUserData("playerFeetSensor");
         sensor.dispose();
+        sensor = new PolygonShape();
+        sensor.set(new Vector2[]{
+                new Vector2(0.09f,-0.23f),
+                new Vector2(0.12f,-0.23f),
+                new Vector2(0.21f,0f),
+                new Vector2(0.18f,0f)});
+        fixtureDef = new FixtureDef();
+        fixtureDef.shape = sensor;
+        fixtureDef.isSensor = true;
+        sensorFixture = playerBody.createFixture(fixtureDef);
+        sensorFixture.setUserData("playerFrontSensor");
+        sensor.dispose();
 
         playerBody.setBullet(true);
-        velocity = 0.8f;
+        velocity = 1.5f;
         isGrounded = false;
     }
 
@@ -82,19 +93,19 @@ public class Player extends Image{
                 vertices = new Vector2[6];
                 vertices[0] = new Vector2(-0.18f, -0.47f);
                 vertices[1] = new Vector2(0.05f, -0.47f);
-                vertices[2] = new Vector2(0.11f, -0.34f);
-                vertices[3] = new Vector2(0.10f, -0.20f);
+                vertices[2] = new Vector2(0.09f, -0.34f);
+                vertices[3] = new Vector2(0.13f, -0.16f);
                 vertices[4] = new Vector2(-0.12f, -0.15f);
                 vertices[5] = new Vector2(-0.22f, -0.30f);
                 return vertices;
             }
             case 1:{
-                vertices = new Vector2[5];
+                vertices = new Vector2[4];
                 vertices[0] = new Vector2(0.12f, -0.20f);
-                vertices[1] = new Vector2(0.20f, -0.10f);
-                vertices[2] = new Vector2(0.20f, 0f);
-                vertices[3] = new Vector2(-0.08f, 0.10f);
-                vertices[4] = new Vector2(-0.15f, -0.15f);
+//                vertices[1] = new Vector2(0.20f, -0.10f);
+                vertices[1] = new Vector2(0.23f, 0.05f);
+                vertices[2] = new Vector2(-0.08f, 0.10f);
+                vertices[3] = new Vector2(-0.15f, -0.15f);
                 return vertices;
             }
             case 2:{
@@ -139,8 +150,8 @@ public class Player extends Image{
         super.act(delta);
         if (playerBody.getLinearVelocity().x < velocity && isGrounded){
             //if player velocity < 5 make acceleration
-            if (velocity < 5.0f){
-                velocity += 0.001f;
+            if (velocity < 10.0f){
+                velocity += 0.002f;
             }
 
             playerBody.setLinearVelocity(velocity, 0);
@@ -149,8 +160,8 @@ public class Player extends Image{
         } else {
             if (isGrounded){
                 //if player velocity < 5 make acceleration
-                if (velocity < 5.0f){
-                    velocity += 0.001f;
+                if (velocity < 10.0f){
+                    velocity += 0.002f;
                 }
                 playerBody.setLinearVelocity(velocity, playerBody.getMass()*world.getGravity().y);
 
@@ -182,13 +193,5 @@ public class Player extends Image{
 
     public void setGrounded(boolean grounded) {
         this.isGrounded = grounded;
-    }
-
-    public void setTimer(float timer) {
-        this.timer = timer;
-    }
-
-    public float getTimer() {
-        return timer;
     }
 }

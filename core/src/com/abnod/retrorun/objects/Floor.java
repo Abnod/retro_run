@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
@@ -23,8 +24,12 @@ public class Floor extends Image{
     private TextureRegion textureRegion;
     private Body body;
     private EdgeShape shape;
+    private PolygonShape middleShape;
     private FixtureDef fixtureDef;
     private Fixture fixture;
+    private Fixture fixturePitL;
+    private Fixture fixturePitM;
+    private Fixture fixturePitR;
     Array <Fixture> fixtures;
 
     private int floorTypeIndex;
@@ -44,6 +49,7 @@ public class Floor extends Image{
         body = world.createBody(groundBodyDef);
 
         shape = new EdgeShape();
+        middleShape = new PolygonShape();
         fixtureDef = new FixtureDef();
         fixtureDef.density = 1;
         fixtureDef.friction = 0.0f;
@@ -67,16 +73,24 @@ public class Floor extends Image{
                 break;
             }
             case 3:{
-                shape.set(-WIDTH/2, HEIGHT/2, -WIDTH/2, -HEIGHT/2);
+                shape.set(-WIDTH/2, HEIGHT/2 -0.20f, -WIDTH/2, 0);
                 fixtureDef.shape = shape;
-                body.createFixture(fixtureDef);
-                shape.set(WIDTH/2, HEIGHT/2, WIDTH/2, -HEIGHT/2);
+                fixtureDef.isSensor = true;
+                fixturePitL = body.createFixture(fixtureDef);
+                fixturePitL.setUserData("groundPit");
+                middleShape.setAsBox(WIDTH/2, WIDTH/4);
+                fixtureDef.shape = middleShape;
+                fixturePitM = body.createFixture(fixtureDef);
+                fixturePitM.setUserData("groundPit");
+                shape.set(WIDTH/2, 0, WIDTH/2, HEIGHT/2 -0.5f);
                 fixtureDef.shape = shape;
-                body.createFixture(fixtureDef);
-                break;
+                fixturePitR = body.createFixture(fixtureDef);
+                fixturePitR.setUserData("groundPit");
+                return;
             }
         }
         fixtureDef.shape = shape;
+        fixtureDef.isSensor = false;
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData("ground");
     }

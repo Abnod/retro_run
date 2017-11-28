@@ -35,6 +35,14 @@ public class Background extends Image {
         }
         if (firstX + viewport.getWorldWidth() <= gameScreen.getCamera().position.x - viewport.getWorldWidth()/2){
             firstX = secondX + viewport.getWorldWidth();
+        } else {
+            if (firstX < secondX){
+                firstX += 0.020f;
+                secondX = firstX + viewport.getWorldWidth();
+            } else {
+                secondX += 0.020f;
+                firstX = secondX + viewport.getWorldWidth();
+            }
         }
     }
 

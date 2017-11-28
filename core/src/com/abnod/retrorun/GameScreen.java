@@ -40,11 +40,11 @@ public class GameScreen implements Screen {
     Texture bg;
 
     private float playerAnchor = 2.0f;
-    private int sourceX = 0;
     private final float groundHeight = 2.0f;
     private float accum = 0f;
     private final float step = 1f / 60f;
     private final float maxAccum = 1f / 20f;
+    private boolean gameOver = false;
 
 
     public GameScreen(RunnerGame runnerGame) {
@@ -81,13 +81,15 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        camera.update();
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        stage.act();
-        stage.draw();
-//        debugRenderer.render(world, camera.combined);
-        worldStep(delta);
+        if (!gameOver){
+            camera.update();
+            Gdx.gl.glClearColor(0, 0, 0, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            stage.act();
+            stage.draw();
+//            debugRenderer.render(world, camera.combined);
+            worldStep(delta);
+        }
     }
 
     private void worldStep(float delta) {
@@ -146,5 +148,13 @@ public class GameScreen implements Screen {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 }
