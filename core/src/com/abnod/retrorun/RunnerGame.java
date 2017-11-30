@@ -11,13 +11,14 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class RunnerGame extends Game {
 
 	public enum ScreenType{
-		MENU, GAME
+		MENU, GAME, END_GAME
 	}
 
 	private SpriteBatch batch;
 	private Viewport viewport;
 	private GameScreen gameScreen;
 	private MenuScreen menuScreen;
+	private EndgameScreen endgameScreen;
 	private String playerName;
 	private OrthographicCamera camera;
 
@@ -30,6 +31,7 @@ public class RunnerGame extends Game {
 		camera.position.set(camera.viewportWidth/2, camera.viewportHeight/2,0);
 		this.gameScreen = new GameScreen(this);
 		this.menuScreen = new MenuScreen(this, batch);
+		this.endgameScreen = new EndgameScreen(this, batch);
 		changeScreen(ScreenType.MENU);
 	}
 
@@ -42,6 +44,9 @@ public class RunnerGame extends Game {
 				break;
 			case GAME:
 				setScreen(gameScreen);
+				break;
+			case END_GAME:
+				setScreen(endgameScreen);
 				break;
 		}
 

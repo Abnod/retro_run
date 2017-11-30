@@ -14,17 +14,20 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Floor extends Image{
 
-    private GameScreen gameScreen;
-    private Viewport viewport;
 
     private TextureRegion textureRegion;
     private Body body;
-    private EdgeShape shape;
-    private PolygonShape middleShape;
+
+    private EdgeShape shapeSquare;
+    private EdgeShape shapeUp;
+    private EdgeShape shapeDown;
+    private EdgeShape shapePitLeft;
+    private EdgeShape shapePitRight;
+    private PolygonShape shapePitMiddle;
+
     private FixtureDef fixtureDef;
     private Fixture fixture;
     private Fixture fixturePitL;
@@ -37,9 +40,7 @@ public class Floor extends Image{
     private final int WIDTH = 2;
     private final int HEIGHT = 2;
 
-    public Floor(GameScreen gameScreen, World world, TextureRegion textureRegion, Vector2 position, int floorTypeIndex) {
-        this.gameScreen = gameScreen;
-        this.viewport = gameScreen.getViewport();
+    public Floor(World world, TextureRegion textureRegion, Vector2 position, int floorTypeIndex) {
         this.textureRegion = textureRegion;
         this.floorTypeIndex = floorTypeIndex;
 
@@ -48,8 +49,20 @@ public class Floor extends Image{
         groundBodyDef.position.set(position);
         body = world.createBody(groundBodyDef);
 
-        shape = new EdgeShape();
-        middleShape = new PolygonShape();
+        shapeSquare = new EdgeShape();
+        shapeUp = new EdgeShape();
+        shapeDown = new EdgeShape();
+        shapePitLeft = new EdgeShape();
+        shapePitRight = new EdgeShape();
+        shapePitMiddle = new PolygonShape();
+
+        shapeSquare.set(-WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
+        shapeUp.set(-WIDTH/2, HEIGHT/2-0.5f, WIDTH/2, HEIGHT/2);
+        shapeDown.set(-WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2-0.5f);
+        shapePitLeft.set(-WIDTH/2, HEIGHT/2 -0.20f, -WIDTH/2, 0);
+        shapePitMiddle.setAsBox(WIDTH/2, WIDTH/4);
+        shapePitRight.set(WIDTH/2, 0, WIDTH/2, HEIGHT/2 -0.5f);
+
         fixtureDef = new FixtureDef();
         fixtureDef.density = 1;
         fixtureDef.friction = 0.0f;
@@ -60,36 +73,33 @@ public class Floor extends Image{
     private void setShape(){
         switch (floorTypeIndex){
             case 0:{
-                shape.set(-WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2);
+                fixtureDef.shape = shapeSquare;
                 break;
             }
             case 1: {
-                shape.set(-WIDTH/2, HEIGHT/2-0.5f, WIDTH/2, HEIGHT/2);
+                fixtureDef.shape = shapeUp;
                 break;
             }
             case 2:{
-
-                shape.set(-WIDTH/2, HEIGHT/2, WIDTH/2, HEIGHT/2-0.5f);
+                fixtureDef.shape = shapeDown;
                 break;
             }
             case 3:{
-                shape.set(-WIDTH/2, HEIGHT/2 -0.20f, -WIDTH/2, 0);
-                fixtureDef.shape = shape;
+                fixtureDef.shape = shapePitLeft;
                 fixtureDef.isSensor = true;
                 fixturePitL = body.createFixture(fixtureDef);
-                fixturePitL.setUserData("groundPit");
-                middleShape.setAsBox(WIDTH/2, WIDTH/4);
-                fixtureDef.shape = middleShape;
+                fixtureDef.shape = shapePitMiddle;
                 fixturePitM = body.createFixture(fixtureDef);
-                fixturePitM.setUserData("groundPit");
-                shape.set(WIDTH/2, 0, WIDTH/2, HEIGHT/2 -0.5f);
-                fixtureDef.shape = shape;
+                fixtureDef.shape = shapePitRight;
                 fixturePitR = body.createFixture(fixtureDef);
+
+                fixturePitL.setUserData("groundPit");
+                fixturePitM.setUserData("groundPit");
                 fixturePitR.setUserData("groundPit");
+
                 return;
             }
         }
-        fixtureDef.shape = shape;
         fixtureDef.isSensor = false;
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData("ground");
@@ -99,7 +109,7 @@ public class Floor extends Image{
         if (floorTypeIndex != this.floorTypeIndex){
             this.floorTypeIndex = floorTypeIndex;
             this.textureRegion = textureRegion;
-            body.destroyFixture(fixture);
+//            body.destroyFixture(fixture);
             fixtures = body.getFixtureList();
             while (fixtures.size > 0){
                 body.destroyFixture(fixtures.first());

@@ -21,17 +21,21 @@ public class DesertLevelGenerator extends Image{
     private TextureRegion textureGroundUp;
     private TextureRegion textureGroundDown;
     private TextureRegion textureGroundEmpty;
-    private Body body;
 
     private LinkedList<Floor> floorList;
     private int someTileCount = 0;
     private int someGroundCount = 0;
     private int floorTypeIndex;
+    private float groundHeight;
+    private float positionPreviousX;
+    private float positionPreviousY;
+    private int floorTypeIndexPrevious;
 
     public DesertLevelGenerator(GameScreen gameScreen, World world) {
         this.gameScreen = gameScreen;
         this.viewport = gameScreen.getViewport();
         this.textureAtlas = new TextureAtlas("ground_desert.pack");
+        this.groundHeight = gameScreen.getGroundHeight();
 
         textureGround = textureAtlas.findRegion("ground-01");
         textureGroundUp = textureAtlas.findRegion("ground-02");
@@ -40,7 +44,7 @@ public class DesertLevelGenerator extends Image{
 
         floorList = new LinkedList<Floor>();
         for (int i = 0; i < 16; i+=2) {
-            floorList.add(new Floor(gameScreen, world, textureGround, new Vector2(i + 1f, gameScreen.getGroundHeight() / 4), 0));
+            floorList.add(new Floor(world, textureGround, new Vector2(i + 1f, groundHeight / 4), 0));
         }
     }
 
@@ -52,9 +56,13 @@ public class DesertLevelGenerator extends Image{
             Floor previous = floorList.getLast();
             floorList.offer(current);
 
+            positionPreviousX = previous.getBody().getPosition().x;
+            positionPreviousY = previous.getBody().getPosition().y;
+            floorTypeIndexPrevious = previous.getFloorTypeIndex();
+
             do{
                  floorTypeIndex = (int)(Math.random()*7);
-            } while (checkFloor(floorTypeIndex, previous));
+            } while (checkFloor(floorTypeIndex));
             if (floorTypeIndex != 3){someTileCount = 0; someGroundCount++;}
 
             updateFloorType(floorTypeIndex, current, previous);
@@ -63,52 +71,48 @@ public class DesertLevelGenerator extends Image{
     }
 
     private void updateFloorType(int floorTypeIndex, Floor current, Floor previous){
+        float positionNew = positionPreviousX +2;
         switch (floorTypeIndex){
             case 0:{
-                current.updateType(floorTypeIndex, textureGround, previous.getBody().getPosition().x + 2, randomizeHeight(floorTypeIndex, previous));
+                current.updateType(floorTypeIndex, textureGround, positionNew, randomizeHeight(floorTypeIndex));
                 break;
             }
             case 1:{
-                current.updateType(floorTypeIndex, textureGroundUp, previous.getBody().getPosition().x + 2, randomizeHeight(floorTypeIndex, previous));
+                current.updateType(floorTypeIndex, textureGroundUp, positionNew, randomizeHeight(floorTypeIndex));
                 break;
             }
             case 2:{
-                current.updateType(floorTypeIndex, textureGroundDown, previous.getBody().getPosition().x + 2, randomizeHeight(floorTypeIndex, previous));
+                current.updateType(floorTypeIndex, textureGroundDown, positionNew, randomizeHeight(floorTypeIndex));
                 break;
             }
             case 3:{
-                current.updateType(floorTypeIndex, textureGroundEmpty, previous.getBody().getPosition().x + 2, randomizeHeight(floorTypeIndex, previous));
+                current.updateType(floorTypeIndex, textureGroundEmpty, positionNew, randomizeHeight(floorTypeIndex));
                 break;
             }
         }
     }
 
-    private float randomizeHeight(int floorTypeIndex, Floor previous){
-        if (floorTypeIndex == 1 &&previous.getFloorTypeIndex() != 2){
-            return previous.getBody().getPosition().y + 0.5f;
-        }
-        if (floorTypeIndex == 3 && previous.getFloorTypeIndex() == 2){
-            return previous.getBody().getPosition().y - 0.5f;
-        }
-        if (floorTypeIndex == 0 && previous.getFloorTypeIndex() == 2) {
-            return previous.getBody().getPosition().y - 0.5f;
-        }
-        return previous.getBody().getPosition().y;
+    private float randomizeHeight(int floorTypeIndex){
+        if (floorTypeIndex == 1 && floorTypeIndexPrevious != 2){
+            return positionPreviousY + 0.5f;
+        } else if (floorTypeIndex == 3 && floorTypeIndexPrevious == 2){
+            return positionPreviousY - 0.5f;
+        } else if (floorTypeIndex == 0 && floorTypeIndexPrevious == 2) {
+            return positionPreviousY - 0.5f;
+        } else return positionPreviousY;
     }
 
-    private boolean checkFloor(int floorIndex, Floor previousFloor){
+    private boolean checkFloor(int floorIndex){
         if (floorIndex == 1){floorTypeIndex = 0;}
         else if (floorIndex == 2 || floorIndex == 3){floorTypeIndex = 1;}
         else if (floorIndex == 4 || floorIndex == 5){floorTypeIndex = 2;}
         else if (floorIndex == 6){floorTypeIndex = 3;}
 
         if (floorTypeIndex == 1) {
-            return floorTypeIndex == previousFloor.getFloorTypeIndex() || previousFloor.getFloorTypeIndex() != 2 && previousFloor.getBody().getPosition().y != 0.5f;
-        }
-        if (floorTypeIndex == 2) {
-            return floorTypeIndex == previousFloor.getFloorTypeIndex() || (previousFloor.getFloorTypeIndex() == 0 || previousFloor.getFloorTypeIndex() == 3) && previousFloor.getBody().getPosition().y != 1;
-        }
-        if (floorTypeIndex == 3){
+            return floorTypeIndex == floorTypeIndexPrevious || floorTypeIndexPrevious != 2 && positionPreviousY != 0.5f;
+        } else if (floorTypeIndex == 2) {
+            return floorTypeIndex == floorTypeIndexPrevious || (floorTypeIndexPrevious == 0 || floorTypeIndexPrevious == 3) && positionPreviousY != 1;
+        } else if (floorTypeIndex == 3){
             if (someTileCount > 1 ){
                 return true;
             } else {

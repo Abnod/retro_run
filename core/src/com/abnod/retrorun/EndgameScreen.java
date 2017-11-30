@@ -16,19 +16,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class MenuScreen implements Screen {
+public class EndgameScreen implements Screen {
 
     private RunnerGame runnerGame;
     private SpriteBatch batch;
     private TextureAtlas atlas;
     private Stage stage;
     private Skin skin;
-    private Viewport viewport;
+    Viewport viewport;
 
     private BitmapFont font96;
     private BitmapFont font32;
 
-    public MenuScreen(RunnerGame runnerGame, SpriteBatch batch) {
+    public EndgameScreen(RunnerGame runnerGame, SpriteBatch batch) {
         this.runnerGame = runnerGame;
         this.batch = batch;
         viewport = new FitViewport(1280,720);
@@ -101,8 +101,8 @@ public class MenuScreen implements Screen {
         buttonPlay.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                runnerGame.setPlayerName(textFieldNickname.getText());
                 runnerGame.changeScreen(RunnerGame.ScreenType.GAME);
+                runnerGame.setPlayerName(textFieldNickname.getText());
             }
         });
     }
@@ -135,6 +135,5 @@ public class MenuScreen implements Screen {
         atlas.dispose();
         font32.dispose();
         font96.dispose();
-
     }
 }

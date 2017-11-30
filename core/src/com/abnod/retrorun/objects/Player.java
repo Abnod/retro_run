@@ -25,6 +25,7 @@ public class Player extends Image{
     private int doubleJumpTime=0;
     private float velocity;
     private boolean isGrounded;
+    private int score;
 
     private final float WIDTH = 1;
     private final float HEIGHT = 1;
@@ -39,9 +40,7 @@ public class Player extends Image{
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(positionX+0.1f,positionY);
 
-
         playerBody = world.createBody(bodyDef);
-        playerBody.setFixedRotation(true);
 
         for (int i = 0; i < 3; i++) {
             PolygonShape shape = new PolygonShape();
@@ -82,8 +81,8 @@ public class Player extends Image{
         sensor.dispose();
 
         playerBody.setBullet(true);
+        playerBody.setFixedRotation(true);
         velocity = 1.5f;
-        isGrounded = false;
     }
 
     private Vector2 [] getVertices(int i){
@@ -148,50 +147,45 @@ public class Player extends Image{
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (playerBody.getLinearVelocity().x < velocity && isGrounded){
-            //if player velocity < 5 make acceleration
-            if (velocity < 10.0f){
-                velocity += 0.002f;
-            }
-
-            playerBody.setLinearVelocity(velocity, 0);
-
-
-        } else {
-            if (isGrounded){
-                //if player velocity < 5 make acceleration
-                if (velocity < 10.0f){
-                    velocity += 0.002f;
-                }
-                playerBody.setLinearVelocity(velocity, playerBody.getMass()*world.getGravity().y);
-
-            }
+        if (isGrounded){
+            //if move up (speed slower then velocity) set gravity to 0
+             if (playerBody.getLinearVelocity().x < velocity){
+                 //if velocity < 10 (cap) make acceleration
+                 if (velocity < 10.0f){
+                     velocity += 0.002f;
+                 }
+                 playerBody.setLinearVelocity(velocity, 0);
+             } else {
+                 if (velocity < 10.0f){
+                     velocity += 0.002f;
+                 }
+                 playerBody.setLinearVelocity(velocity, playerBody.getMass()*world.getGravity().y);
+             }
         }
 
         //when grounded run animation (time)
         if (isGrounded){
-//            time += 240f * delta / 300.0f;
             time += 240*(1+playerBody.getLinearVelocity().x/2) * delta / 600.0f;
-            if (doubleJumpTime > 0){
                 doubleJumpTime = 0;
-            }
         }
 
         //jump
-        if (Gdx.input.justTouched() && (isGrounded || doubleJumpTime == 1)){
+        if (Gdx.input.justTouched() && (doubleJumpTime < 2)){
             isGrounded = false;
             doubleJumpTime++;
             playerBody.setLinearVelocity(playerBody.getLinearVelocity().x, 0);
             playerBody.applyForceToCenter(0f, 100f,true);
 //            soundJump.play();.
         }
-    }
 
-    public Body getBody() {
-        return playerBody;
+        score = (int)playerBody.getPosition().x*10;
     }
 
     public void setGrounded(boolean grounded) {
         this.isGrounded = grounded;
+    }
+
+    public int getScore() {
+        return score;
     }
 }
