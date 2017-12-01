@@ -5,31 +5,39 @@ import com.abnod.retrorun.listeners.PlayerListener;
 import com.abnod.retrorun.objects.Background;
 import com.abnod.retrorun.objects.DesertLevelGenerator;
 import com.abnod.retrorun.objects.Player;
-import com.abnod.retrorun.objects.Text;
+import com.abnod.retrorun.objects.GameInterface;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen implements Screen {
 
+    private RunnerGame runnerGame;
+    private Batch batch;
     private Viewport viewport;
     private OrthographicCamera camera;
     private Stage stage;
+    private Stage pauseStage;
     private Box2DDebugRenderer debugRenderer;
 
     private World world;
     private Player player;
     private DesertLevelGenerator desertLevelGenerator;
     private Background background;
-    private Text gameScreenText;
+    private Stage gameInterface;
+    private TextButton buttonPause;
 
     private TextureAtlas atlas;
     private TextureRegion textureBackground;
@@ -38,6 +46,7 @@ public class GameScreen implements Screen {
     Texture bg;
 
     private boolean gameOver = false;
+    private boolean paused = false;
     private float playerAnchor = 2.0f;
     private float accum = 0f;
     private final float groundHeight = 2.0f;
@@ -46,6 +55,8 @@ public class GameScreen implements Screen {
 
 
     public GameScreen(RunnerGame runnerGame) {
+        this.runnerGame = runnerGame;
+        this.batch = runnerGame.getBatch();
         this.camera = runnerGame.getCamera();
         this.viewport = runnerGame.getViewport();
         debugRenderer = new Box2DDebugRenderer();
@@ -53,7 +64,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        world = new World(new Vector2(0.0f,-12f), true);
+        world = new World(new Vector2(0.0f, -12f), true);
 
         atlas = new TextureAtlas("runner.pack");
         textureRunner = atlas.findRegion("runner");
@@ -64,28 +75,43 @@ public class GameScreen implements Screen {
         background = new Background(this, textureBackground);
         desertLevelGenerator = new DesertLevelGenerator(this, world);
         player = new Player(this, world, textureRunner, textureBird, playerAnchor, groundHeight);
-        gameScreenText = new Text(this);
+
+        gameInterface = new GameInterface(this, atlas, batch);
 
         stage = new Stage(viewport);
         stage.addActor(background);
         stage.addActor(desertLevelGenerator);
         stage.addActor(player);
-        stage.addActor(gameScreenText);
+
+        pauseStage = new PauseStage(this, new FitViewport(1280, 720), batch, atlas);
+        stage.addActor(background);
+        stage.addActor(desertLevelGenerator);
+        stage.addActor(player);
 
         world.setContactListener(new PlayerListener(this));
-        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void render(float delta) {
-        if (!gameOver){
+        if (!gameOver) {
             camera.update();
-//            Gdx.gl.glClearColor(0, 0, 0, 1);
-//            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            stage.act();
-            stage.draw();
-            debugRenderer.render(world, camera.combined);
-            worldStep(delta);
+            Gdx.gl.glClearColor(0, 0, 0, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            if (paused) {
+                Gdx.input.setInputProcessor(pauseStage);
+                pauseStage.act();
+                pauseStage.draw();
+            } else {
+                Gdx.input.setInputProcessor(gameInterface);
+                gameInterface.act();
+                stage.act();
+                stage.draw();
+                gameInterface.draw();
+                debugRenderer.render(world, camera.combined);
+                worldStep(delta);
+            }
+        } else {
+            runnerGame.changeScreen(RunnerGame.ScreenType.END_GAME);
         }
     }
 
@@ -147,11 +173,19 @@ public class GameScreen implements Screen {
         return player;
     }
 
-    public boolean isGameOver() {
-        return gameOver;
-    }
-
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
+    }
+
+    RunnerGame getRunnerGame() {
+        return runnerGame;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 }
