@@ -82,7 +82,7 @@ public class Player extends Image {
 
         playerBody.setBullet(true);
         playerBody.setFixedRotation(true);
-        velocity = 1.62f;
+        velocity = 1.8f;
     }
 
     private Vector2[] getVertices(int i) {
@@ -101,7 +101,6 @@ public class Player extends Image {
             case 1: {
                 vertices = new Vector2[4];
                 vertices[0] = new Vector2(0.12f, -0.20f);
-//                vertices[1] = new Vector2(0.20f, -0.10f);
                 vertices[1] = new Vector2(0.23f, 0.05f);
                 vertices[2] = new Vector2(-0.08f, 0.10f);
                 vertices[3] = new Vector2(-0.15f, -0.15f);
@@ -159,7 +158,8 @@ public class Player extends Image {
             isGrounded = false;
             doubleJumpTime++;
             playerBody.setLinearVelocity(playerBody.getLinearVelocity().x, 0);
-            playerBody.applyForceToCenter(0f, 100f, true);
+            playerBody.applyForceToCenter(0f, 500f, true);
+            Gdx.input.vibrate(200);
 //            soundJump.play();.
         }
 
@@ -184,5 +184,13 @@ public class Player extends Image {
 
     public void setGrounded(boolean grounded) {
         this.isGrounded = grounded;
+    }
+
+    public float getVelocity() {
+        return velocity;
+    }
+
+    public Body getPlayerBody() {
+        return playerBody;
     }
 }

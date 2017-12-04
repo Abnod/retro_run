@@ -18,7 +18,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -37,21 +36,19 @@ public class GameScreen implements Screen {
     private DesertLevelGenerator desertLevelGenerator;
     private Background background;
     private Stage gameInterface;
-    private TextButton buttonPause;
 
     private TextureAtlas atlas;
     private TextureRegion textureBackground;
     private TextureRegion textureBird;
     private TextureRegion textureRunner;
-    Texture bg;
+    private Texture bg;
 
     private boolean gameOver = false;
     private boolean paused = false;
     private float playerAnchor = 2.0f;
-    private float accum = 0f;
     private final float groundHeight = 2.0f;
-    private final float step = 1f / 60f;
-    private final float maxAccum = 1f / 20f;
+    private float accumulator = 0;
+    private static final float STEP_TIME = 1f/300f;
 
 
     public GameScreen(RunnerGame runnerGame) {
@@ -84,9 +81,6 @@ public class GameScreen implements Screen {
         stage.addActor(player);
 
         pauseStage = new PauseStage(this, new FitViewport(1280, 720), batch, atlas);
-        stage.addActor(background);
-        stage.addActor(desertLevelGenerator);
-        stage.addActor(player);
 
         world.setContactListener(new PlayerListener(this));
     }
@@ -107,7 +101,7 @@ public class GameScreen implements Screen {
                 stage.act();
                 stage.draw();
                 gameInterface.draw();
-                debugRenderer.render(world, camera.combined);
+//                debugRenderer.render(world, camera.combined);
                 worldStep(delta);
             }
         } else {
@@ -116,11 +110,11 @@ public class GameScreen implements Screen {
     }
 
     private void worldStep(float delta) {
-        accum += delta;
-        accum = Math.min(accum, maxAccum);
-        while (accum > step) {
-            world.step(step, 8, 3);
-            accum -= step;
+        float frameTime = Math.min(delta, 0.25f);
+        accumulator += frameTime;
+        while (accumulator >= STEP_TIME) {
+            world.step(STEP_TIME, 6, 2);
+            accumulator -= STEP_TIME;
         }
     }
 

@@ -29,16 +29,19 @@ public class Background extends Image {
     public void act(float delta) {
         super.act(delta);
         float screenCornerX = gameScreen.getCamera().position.x - worldWidth / 2;
+        float bodypos = gameScreen.getPlayer().getVelocity();
         if (secondX + worldWidth < screenCornerX) {
             secondX = firstX + worldWidth;
         } else if (firstX + worldWidth <= screenCornerX) {
             firstX = secondX + worldWidth;
         }
         if (firstX < secondX) {
-            firstX += 0.020f;
+            firstX += bodypos*0.01f;
+//            firstX += 0.020f;
             secondX = firstX + worldWidth;
         } else {
-            secondX += 0.020f;
+            secondX += bodypos*0.01f;
+//            secondX += 0.020f;
             firstX = secondX + worldWidth;
         }
     }
