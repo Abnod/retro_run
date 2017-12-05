@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.Array;
 
 public class Floor extends Image {
 
-
     private TextureRegion textureRegion;
     private Body body;
 
@@ -25,6 +24,7 @@ public class Floor extends Image {
     private EdgeShape shapeDown;
     private EdgeShape shapePitLeft;
     private EdgeShape shapePitRight;
+    private EdgeShape shapePitHalf;
     private PolygonShape shapePitMiddle;
 
     private FixtureDef fixtureDef;
@@ -34,7 +34,7 @@ public class Floor extends Image {
     private final int WIDTH = 2;
     private final int HEIGHT = 2;
 
-    Floor(World world, TextureRegion textureRegion, Vector2 position, int floorTypeIndex) {
+    public Floor(World world, TextureRegion textureRegion, Vector2 position, int floorTypeIndex) {
         this.textureRegion = textureRegion;
         this.floorTypeIndex = floorTypeIndex;
 
@@ -47,6 +47,7 @@ public class Floor extends Image {
         shapeUp = new EdgeShape();
         shapeDown = new EdgeShape();
         shapePitLeft = new EdgeShape();
+        shapePitHalf = new EdgeShape();
         shapePitRight = new EdgeShape();
         shapePitMiddle = new PolygonShape();
 
@@ -54,6 +55,7 @@ public class Floor extends Image {
         shapeUp.set(-WIDTH / 2, HEIGHT / 2 - 0.5f, WIDTH / 2, HEIGHT / 2);
         shapeDown.set(-WIDTH / 2, HEIGHT / 2, WIDTH / 2, HEIGHT / 2 - 0.5f);
         shapePitLeft.set(-WIDTH / 2, HEIGHT / 2 - 0.20f, -WIDTH / 2, 0);
+        shapePitHalf.set(-WIDTH / 2, HEIGHT / 2 - 0.6f, -WIDTH / 2, 0);
         shapePitMiddle.setAsBox(WIDTH / 2, HEIGHT / 3);
         shapePitRight.set(WIDTH / 2, 0, WIDTH / 2, HEIGHT / 2 - 0.20f);
 
@@ -67,30 +69,49 @@ public class Floor extends Image {
     private void setShape() {
         switch (floorTypeIndex) {
             case 0: {
+                fixtureDef.shape = shapePitLeft;
+                fixtureDef.isSensor = true;
+                Fixture fixturePitL = body.createFixture(fixtureDef);
+                fixturePitL.setUserData("groundPit");
+
+                fixtureDef.shape = shapePitRight;
+                Fixture fixturePitR = body.createFixture(fixtureDef);
+                fixturePitR.setUserData("groundPit");
+
                 fixtureDef.shape = shapeSquare;
                 break;
             }
             case 1: {
+                fixtureDef.shape = shapePitHalf;
+                fixtureDef.isSensor = true;
+                Fixture fixturePitL = body.createFixture(fixtureDef);
+                fixturePitL.setUserData("groundPit");
+
+                fixtureDef.shape = shapePitRight;
+                Fixture fixturePitR = body.createFixture(fixtureDef);
+                fixturePitR.setUserData("groundPit");
+
                 fixtureDef.shape = shapeUp;
                 break;
             }
             case 2: {
+                fixtureDef.shape = shapePitLeft;
+                fixtureDef.isSensor = true;
+                Fixture fixturePitL = body.createFixture(fixtureDef);
+                fixturePitL.setUserData("groundPit");
+
+                fixtureDef.shape = shapePitHalf;
+                Fixture fixturePitR = body.createFixture(fixtureDef);
+                fixturePitR.setUserData("groundPit");
+
                 fixtureDef.shape = shapeDown;
                 break;
             }
             case 3: {
-                fixtureDef.shape = shapePitLeft;
-                fixtureDef.isSensor = true;
-                Fixture fixturePitL = body.createFixture(fixtureDef);
                 fixtureDef.shape = shapePitMiddle;
+                fixtureDef.isSensor = true;
                 Fixture fixturePitM = body.createFixture(fixtureDef);
-                fixtureDef.shape = shapePitRight;
-                Fixture fixturePitR = body.createFixture(fixtureDef);
-
-                fixturePitL.setUserData("groundPit");
                 fixturePitM.setUserData("groundPit");
-                fixturePitR.setUserData("groundPit");
-
                 return;
             }
         }
@@ -99,7 +120,7 @@ public class Floor extends Image {
         fixture.setUserData("ground");
     }
 
-    void updateType(int floorTypeIndex, TextureRegion textureRegion, float positionX, float positionY) {
+    public void updateType(int floorTypeIndex, TextureRegion textureRegion, float positionX, float positionY) {
         if (floorTypeIndex != this.floorTypeIndex) {
             this.floorTypeIndex = floorTypeIndex;
             this.textureRegion = textureRegion;
@@ -123,11 +144,11 @@ public class Floor extends Image {
         batch.draw(textureRegion, body.getPosition().x - WIDTH / 2 - 0.03f, body.getPosition().y - HEIGHT / 2, 0f, 0f, WIDTH + 0.015f, HEIGHT, 1f, 1f, 0);
     }
 
-    Body getBody() {
+    public Body getBody() {
         return body;
     }
 
-    int getFloorTypeIndex() {
+    public int getFloorTypeIndex() {
         return floorTypeIndex;
     }
 }

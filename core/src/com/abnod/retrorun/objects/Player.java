@@ -4,6 +4,7 @@ import com.abnod.retrorun.GameScreen;
 import com.abnod.retrorun.RunnerGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -18,7 +19,7 @@ public class Player extends Image {
 
     private GameScreen gameScreen;
     private World world;
-    private TextureRegion[][] textureRegion;
+    private TextureRegion[][] texturePlayer;
     private TextureRegion textureRegionJump;
     private Body playerBody;
 
@@ -30,11 +31,11 @@ public class Player extends Image {
     private final float WIDTH = 1;
     private final float HEIGHT = 1;
 
-    public Player(GameScreen gameScreen, World world, TextureRegion textureRegion, TextureRegion textureRegionJump, float positionX, float positionY) {
+    public Player(GameScreen gameScreen, World world, TextureAtlas textureAtlas, float positionX, float positionY) {
         this.gameScreen = gameScreen;
         this.world = world;
-        this.textureRegion = textureRegion.split(100, 100);
-        this.textureRegionJump = textureRegionJump;
+        this.texturePlayer = textureAtlas.findRegion("runner").split(100, 100);
+        this.textureRegionJump = textureAtlas.findRegion("bird");
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -132,13 +133,13 @@ public class Player extends Image {
 
         //jumptime: 1 jump, 2 doublejump, 0 - grounded;
         if (doubleJumpTime == 1) {
-            batch.draw(textureRegion[0][4], playerBody.getPosition().x - WIDTH / 2, playerBody.getPosition().y - HEIGHT / 2, WIDTH / 2, HEIGHT / 2,
+            batch.draw(texturePlayer[0][4], playerBody.getPosition().x - WIDTH / 2, playerBody.getPosition().y - HEIGHT / 2, WIDTH / 2, HEIGHT / 2,
                     WIDTH, HEIGHT, 1, 1, 0);
         } else if (doubleJumpTime == 2) {
             batch.draw(textureRegionJump, playerBody.getPosition().x - WIDTH / 2, playerBody.getPosition().y - HEIGHT / 2, WIDTH / 2, HEIGHT / 2,
                     WIDTH, HEIGHT, 1, 1, 0);
         } else {
-            batch.draw(textureRegion[0][frame], playerBody.getPosition().x - WIDTH / 2, playerBody.getPosition().y - HEIGHT / 2, WIDTH / 2, HEIGHT / 2,
+            batch.draw(texturePlayer[0][frame], playerBody.getPosition().x - WIDTH / 2, playerBody.getPosition().y - HEIGHT / 2, WIDTH / 2, HEIGHT / 2,
                     WIDTH, HEIGHT, 1, 1, 0);
         }
     }

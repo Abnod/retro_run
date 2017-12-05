@@ -1,9 +1,10 @@
 package com.abnod.retrorun;
 
 
+import com.abnod.retrorun.generators.DesertEnemyGenerator;
 import com.abnod.retrorun.listeners.PlayerListener;
 import com.abnod.retrorun.objects.Background;
-import com.abnod.retrorun.objects.DesertLevelGenerator;
+import com.abnod.retrorun.generators.DesertLevelGenerator;
 import com.abnod.retrorun.objects.Player;
 import com.abnod.retrorun.objects.GameInterface;
 import com.badlogic.gdx.Gdx;
@@ -34,13 +35,12 @@ public class GameScreen implements Screen {
     private World world;
     private Player player;
     private DesertLevelGenerator desertLevelGenerator;
+    private DesertEnemyGenerator desertEnemyGenerator;
     private Background background;
     private Stage gameInterface;
 
     private TextureAtlas atlas;
     private TextureRegion textureBackground;
-    private TextureRegion textureBird;
-    private TextureRegion textureRunner;
     private Texture bg;
 
     private boolean gameOver = false;
@@ -64,19 +64,19 @@ public class GameScreen implements Screen {
         world = new World(new Vector2(0.0f, -12f), true);
 
         atlas = new TextureAtlas("runner.pack");
-        textureRunner = atlas.findRegion("runner");
-        textureBird = atlas.findRegion("bird");
         bg = new Texture("bg.jpg");
         textureBackground = new TextureRegion(bg);
 
         background = new Background(this, textureBackground);
         desertLevelGenerator = new DesertLevelGenerator(this, world);
-        player = new Player(this, world, textureRunner, textureBird, playerAnchor, groundHeight);
+        desertEnemyGenerator = new DesertEnemyGenerator(this, world, atlas);
+        player = new Player(this, world, atlas, playerAnchor, groundHeight);
 
         gameInterface = new GameInterface(this, atlas, batch);
 
         stage = new Stage(viewport);
         stage.addActor(background);
+        stage.addActor(desertEnemyGenerator);
         stage.addActor(desertLevelGenerator);
         stage.addActor(player);
 
@@ -101,7 +101,7 @@ public class GameScreen implements Screen {
                 stage.act();
                 stage.draw();
                 gameInterface.draw();
-//                debugRenderer.render(world, camera.combined);
+                debugRenderer.render(world, camera.combined);
                 worldStep(delta);
             }
         } else {
@@ -181,5 +181,9 @@ public class GameScreen implements Screen {
 
     public boolean isPaused() {
         return paused;
+    }
+
+    public DesertLevelGenerator getDesertLevelGenerator() {
+        return desertLevelGenerator;
     }
 }

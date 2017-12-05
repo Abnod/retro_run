@@ -1,6 +1,7 @@
-package com.abnod.retrorun.objects;
+package com.abnod.retrorun.generators;
 
 import com.abnod.retrorun.GameScreen;
+import com.abnod.retrorun.objects.Floor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -139,5 +140,9 @@ public class DesertLevelGenerator extends Image {
         for (Floor floor : floorList) {
             floor.draw(batch, parentAlpha);
         }
+    }
+
+    public LinkedList<Floor> getFloorList() {
+        return floorList;
     }
 }

@@ -68,7 +68,6 @@ public class GameInterface extends Stage {
         buttonPause.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("click");
                 gameScreen.setPaused(true);
                 return true;
             }
