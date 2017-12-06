@@ -26,19 +26,18 @@ public class PlayerListener implements ContactListener {
     public void beginContact(Contact contact) {
         fixtureA = contact.getFixtureA();
         fixtureB = contact.getFixtureB();
-        if (fixtureA.getUserData() != null  && fixtureA.getUserData().equals("groundPit")){
+//        System.out.println(fixtureA.getUserData() + " " + fixtureB.getUserData());
+        if ((fixtureA.getUserData() != null  && fixtureA.getUserData().equals("groundPit")) || (fixtureB.getUserData() != null  && fixtureB.getUserData().equals("groundPit"))){
             gameScreen.setGameOver(true);
-        }
-        if (fixtureB.getUserData() != null  && fixtureB.getUserData().equals("groundPit")){
+        } else if ((fixtureB.getUserData() != null && fixtureB.getUserData().equals("playerFrontSensor")) || (fixtureA.getUserData() != null && fixtureA.getUserData().equals("playerFrontSensor"))){
             gameScreen.setGameOver(true);
-        }
-        if (fixtureA.getUserData() != null  && fixtureB.getUserData() != null){
-            if (fixtureA.getUserData().equals("ground")){
-                if (fixtureB.getUserData().equals("playerFeetSensor")){
-                    player.setGrounded(true);
-                } else if (fixtureB.getUserData().equals("playerFrontSensor")){
-                    gameScreen.setGameOver(true);
-                }
+        } else if (fixtureA.getUserData() != null && fixtureB.getUserData() != null){
+            if (fixtureB.getUserData().equals("playerFeetSensor") || fixtureA.getUserData().equals("playerFeetSensor")){
+                 if (fixtureA.getUserData().equals("ground") || fixtureB.getUserData().equals("ground")){
+                     player.setGrounded(true);
+                 } else if (fixtureA.getUserData().equals("cactus") || fixtureB.getUserData().equals("cactus")){
+                     gameScreen.setGameOver(true);
+                 }
             }
         }
     }

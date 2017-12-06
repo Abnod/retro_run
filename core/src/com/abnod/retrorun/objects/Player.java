@@ -68,12 +68,24 @@ public class Player extends Image {
         Fixture sensorFixture = playerBody.createFixture(fixtureDef);
         sensorFixture.setUserData("playerFeetSensor");
         sensor.dispose();
+
         sensor = new PolygonShape();
         sensor.set(new Vector2[]{
-                new Vector2(0.09f, -0.23f),
-                new Vector2(0.12f, -0.23f),
+                new Vector2(0.07f, -0.40f),
+                new Vector2(0.10f, -0.40f),
                 new Vector2(0.21f, 0f),
                 new Vector2(0.18f, 0f)});
+        fixtureDef = new FixtureDef();
+        fixtureDef.shape = sensor;
+        fixtureDef.isSensor = true;
+        sensorFixture = playerBody.createFixture(fixtureDef);
+        sensorFixture.setUserData("playerFrontSensor");
+        sensor.set(new Vector2[]{
+                new Vector2(0.20f, -0.02f),
+                new Vector2(0.30f, 0.03f),
+                new Vector2(0.37f, 0.25f),
+                new Vector2(0.27f, 0.36f),
+                new Vector2(0.25f, 0.36f)});
         fixtureDef = new FixtureDef();
         fixtureDef.shape = sensor;
         fixtureDef.isSensor = true;

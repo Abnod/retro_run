@@ -41,7 +41,7 @@ public class DesertLevelGenerator extends Image {
         textureGroundEmpty = textureAtlas.findRegion("ground-04");
 
         floorList = new LinkedList<Floor>();
-        for (int i = 0; i < 16; i += 2) {
+        for (int i = 0; i < 32; i += 2) {
             floorList.add(new Floor(world, textureGround, new Vector2(i + 1f, groundHeight / 4), 0));
         }
     }

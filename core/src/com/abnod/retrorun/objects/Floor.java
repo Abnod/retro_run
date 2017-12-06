@@ -24,7 +24,8 @@ public class Floor extends Image {
     private EdgeShape shapeDown;
     private EdgeShape shapePitLeft;
     private EdgeShape shapePitRight;
-    private EdgeShape shapePitHalf;
+    private EdgeShape shapePitHalfLeft;
+    private EdgeShape shapePitHalfRight;
     private PolygonShape shapePitMiddle;
 
     private FixtureDef fixtureDef;
@@ -47,7 +48,8 @@ public class Floor extends Image {
         shapeUp = new EdgeShape();
         shapeDown = new EdgeShape();
         shapePitLeft = new EdgeShape();
-        shapePitHalf = new EdgeShape();
+        shapePitHalfLeft = new EdgeShape();
+        shapePitHalfRight = new EdgeShape();
         shapePitRight = new EdgeShape();
         shapePitMiddle = new PolygonShape();
 
@@ -55,7 +57,8 @@ public class Floor extends Image {
         shapeUp.set(-WIDTH / 2, HEIGHT / 2 - 0.5f, WIDTH / 2, HEIGHT / 2);
         shapeDown.set(-WIDTH / 2, HEIGHT / 2, WIDTH / 2, HEIGHT / 2 - 0.5f);
         shapePitLeft.set(-WIDTH / 2, HEIGHT / 2 - 0.20f, -WIDTH / 2, 0);
-        shapePitHalf.set(-WIDTH / 2, HEIGHT / 2 - 0.6f, -WIDTH / 2, 0);
+        shapePitHalfLeft.set(-WIDTH / 2, HEIGHT / 2 - 0.6f, -WIDTH / 2, 0);
+        shapePitHalfRight.set(WIDTH / 2, HEIGHT / 2 - 0.6f, WIDTH / 2, 0);
         shapePitMiddle.setAsBox(WIDTH / 2, HEIGHT / 3);
         shapePitRight.set(WIDTH / 2, 0, WIDTH / 2, HEIGHT / 2 - 0.20f);
 
@@ -82,7 +85,7 @@ public class Floor extends Image {
                 break;
             }
             case 1: {
-                fixtureDef.shape = shapePitHalf;
+                fixtureDef.shape = shapePitHalfLeft;
                 fixtureDef.isSensor = true;
                 Fixture fixturePitL = body.createFixture(fixtureDef);
                 fixturePitL.setUserData("groundPit");
@@ -100,7 +103,7 @@ public class Floor extends Image {
                 Fixture fixturePitL = body.createFixture(fixtureDef);
                 fixturePitL.setUserData("groundPit");
 
-                fixtureDef.shape = shapePitHalf;
+                fixtureDef.shape = shapePitHalfRight;
                 Fixture fixturePitR = body.createFixture(fixtureDef);
                 fixturePitR.setUserData("groundPit");
 
@@ -150,5 +153,9 @@ public class Floor extends Image {
 
     public int getFloorTypeIndex() {
         return floorTypeIndex;
+    }
+
+    public int getWIDTH() {
+        return WIDTH;
     }
 }
